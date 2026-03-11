@@ -1,0 +1,18 @@
+{
+  "custom_heads": [
+    "promoter_effect_head"
+  ],
+  "head_configs": {
+    "promoter_effect_head": {
+      "source": "custom",
+      "type": "GENOME_TRACKS",
+      "output_type": "RNA_SEQ",
+      "num_tracks": 970,
+      "name": "promoter_effect_head",
+      "metadata": {}
+    }
+  },
+  "save_full_model": false,
+  "save_minimal_model": false,
+  "use_encoder_output": false
+}

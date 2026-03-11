@@ -1,0 +1,22 @@
+{
+  "custom_heads": [
+    "promoter_effect_head"
+  ],
+  "head_configs": {
+    "promoter_effect_head": {
+      "source": "custom",
+      "type": "GENOME_TRACKS",
+      "output_type": "RNA_SEQ",
+      "num_tracks": 128,
+      "name": "promoter_effect_head",
+      "metadata": {
+        "lora_rank": 8,
+        "lora_alpha": 8,
+        "dropout_rate": 0
+      }
+    }
+  },
+  "save_full_model": false,
+  "save_minimal_model": false,
+  "use_encoder_output": false
+}
