@@ -17,7 +17,8 @@ BATCH_SIZE = 4
 LEARNING_RATE = 1e-5
 WEIGHT_DECAY = 1e-5
 NUM_EPOCHS = 10
-HEAD_NAME = 'promoter_effect_head'
+#HEAD_NAME = 'promoter_effect_head'
+HEAD_NAME = 'promoter_profile_head'
 CHECKPOINT_DIR = Path('checkpoints')
 CHECKPOINT_DIR.mkdir(exist_ok=True)
 

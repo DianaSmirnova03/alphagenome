@@ -12,18 +12,14 @@ class PromoterEffectHead(CustomHead):
 
     def predict(self, embeddings, organism_index, gene_mask=None, **kwargs):
         x = embeddings.get_sequence_embeddings(resolution=1)
-
-        if gene_mask is not None:
-            masked = x * gene_mask[..., None]
-            sum_masked = jnp.sum(masked, axis=1)
-            mask_sum = jnp.sum(gene_mask, axis=1, keepdims=True) + 1e-8
-            x_agg = sum_masked / mask_sum
-        else:
-            x_agg = jnp.mean(x, axis=1)
-
-        if self.dropout_rate > 0:
-            x_agg = hk.dropout(hk.next_rng_key(), self.dropout_rate, x_agg)
-
+      #  if gene_mask is not None:
+      #      masked = x * gene_mask[..., None]
+      #      sum_masked = jnp.sum(masked, axis=1)
+      #      mask_sum = jnp.sum(gene_mask, axis=1, keepdims=True) + 1e-8
+      #      x_agg = sum_masked / mask_sum
+      #  else:
+      #      x_agg = jnp.mean(x, axis=1)
+        x_agg = jnp.mean(x, axis=1)
         out = hk.Linear(1, name='output')(x_agg)
         return out
 

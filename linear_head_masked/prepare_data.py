@@ -39,7 +39,6 @@ def add_gene_info(df, genes_dict):
     df["gene_strand"] = df["gene"].map(lambda g: genes_dict.get(g, {}).get("strand", None))
     initial_len = len(df)
     df = df.dropna(subset=["gene_chrom", "gene_start", "gene_end", "gene_strand"])
-    print(f"Удалено {initial_len - len(df)}")
     return df
 
 train_df = pd.read_csv("../data/train_variants.csv", sep=",")
