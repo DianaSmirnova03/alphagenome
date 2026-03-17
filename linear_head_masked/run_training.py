@@ -4,7 +4,7 @@ import optax
 from pathlib import Path
 from tensorboardX import SummaryWriter
 
-from data_loader import VariantDataset
+from data_loader import VariantDataset as PromoterDataset
 from create_model import get_model
 from train import create_train_step, train_epoch, validate
 
@@ -13,7 +13,7 @@ FASTA_PATH = "../hg38.fa"
 EXON_PKL_PATH = "../data/gene_exons.pkl"
 TRAIN_CSV = "../data/train_with_genes.csv"
 VAL_CSV = "../data/val_with_genes.csv"
-BATCH_SIZE = 1
+BATCH_SIZE = 4
 LEARNING_RATE = 1e-5
 WEIGHT_DECAY = 1e-5
 NUM_EPOCHS = 10

@@ -4,7 +4,7 @@ import pyfaidx
 import pickle
 from alphagenome_research.model import one_hot_encoder
 
-WINDOW = 131_072
+WINDOW = 20480
 HALF = WINDOW // 2
 
 class VariantDataset:
@@ -48,16 +48,46 @@ class VariantDataset:
         window_start = pos - HALF
         window_end = pos + HALF
 
-        for (echrom, estart, eend, estrand) in exons:
-            if echrom != chrom or estrand != strand:
+    # ОТЛАДКА: выведем информацию для первого примера (например, CHL1, pos=196298)
+        debug = (gene == 'CHL1' and pos == 196298)
+
+        if debug:
+            print(f"\n=== Отладка для гена {gene} ===")
+            print(f"Хромосома: {chrom}, позиция: {pos}, цепь: {strand}")
+            print(f"Окно: {window_start} – {window_end}")
+            print(f"Количество экзонов в словаре: {len(exons)}")
+
+        for i, (echrom, estart, eend, estrand) in enumerate(exons):
+            if debug:
+                print(f"Экзон {i}: {echrom}:{estart}-{eend} ({estrand})")
+
+            if echrom != chrom:
+                if debug: print("  -> хромосома не совпадает")
                 continue
+
+            estrand_int = 1 if estrand == '+' else -1
+            if estrand_int != strand:
+                if debug: print(f"  -> цепь не совпадает: {estrand_int} != {strand}")
+                continue
+
             overlap_start = max(estart, window_start)
             overlap_end = min(eend, window_end)
+            if debug: print(f"  перекрытие: {overlap_start} – {overlap_end}")
+
             if overlap_end <= overlap_start:
+                if debug: print("  -> перекрытия нет")
                 continue
+
             idx_start = overlap_start - window_start
             idx_end = overlap_end - window_start
+            if debug: print(f"  -> индексы маски: {idx_start} – {idx_end}")
             mask[idx_start:idx_end] = 1.0
+
+        if debug:
+            print(f"Итоговая маска: ненулевых элементов = {np.count_nonzero(mask)}")
+            if np.count_nonzero(mask) > 0:
+                print(f"Первые индексы: {np.where(mask>0)[0][:10]}")
+
         return mask
 
     def _get_seq(self, chrom, center, alt_base=None, strand=1):
