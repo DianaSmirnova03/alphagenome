@@ -15,10 +15,9 @@ register_custom_head(
         output_type=dna_output.OutputType.RNA_SEQ,
         num_tracks=1,
         metadata={
-            'lora_rank': 4,                   
-            'lora_alpha': 8,                   
-            'dropout_rate': 0.3                   
+            'lora_rank': 2,                   
+            'lora_alpha': 2                
         }
     )
 )
-print("LoRA-голова 'promoter_effect_head' зарегистрирована.")
+print("LoRA-голова зарегистрирована.")
