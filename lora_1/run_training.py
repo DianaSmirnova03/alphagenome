@@ -1,10 +1,8 @@
-# run_training.py
 import jax
 import optax
 from pathlib import Path
 from tensorboardX import SummaryWriter
 import numpy as np
-
 from data_loader import PromoterDataset
 from create_model import get_model
 from train import create_train_step, train_epoch, validate
@@ -24,8 +22,6 @@ LOG_DIR = CHECKPOINT_DIR / 'logs'
 writer = SummaryWriter(log_dir=str(LOG_DIR))
 
 device = jax.devices()[0]
-print(f"Используем устройство: {device}")
-
 train_dataset = PromoterDataset(TRAIN_CSV, FASTA_PATH, batch_size=BATCH_SIZE, shuffle=True)
 val_dataset = PromoterDataset(VAL_CSV, FASTA_PATH, batch_size=BATCH_SIZE, shuffle=False)
 
@@ -35,10 +31,9 @@ optimizer = optax.chain(
     optax.adamw(learning_rate=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
 )
 opt_state = optimizer.init(model._params)
-
 train_step = create_train_step(model, optimizer, head_name=HEAD_NAME)
 
-#отладка
+#проверка
 def get_trainable_params(params):
     trainable = []
     def check(path, value):
@@ -47,7 +42,6 @@ def get_trainable_params(params):
             trainable.append(path_str)
     jax.tree_util.tree_map_with_path(check, params)
     return trainable
-
 for p in get_trainable_params(model._params):
     print(" ", p)
 
