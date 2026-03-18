@@ -1,4 +1,3 @@
-# create_model.py
 import jax
 from alphagenome_ft import create_model_with_heads, parameter_utils
 from register_head import *
