@@ -18,7 +18,6 @@ class PromoterEffectHead(CustomHead):
         if self.dropout_rate > 0:
             x = hk.dropout(hk.next_rng_key(), self.dropout_rate, x)
 
-        #линейная проекция с LoRA на num_tracks каналов
         cfg = lora.LoRAConfig(rank=self.lora_rank, alpha=self.lora_alpha)
         out = lora.LoRALinear(self._num_tracks, cfg, name='output')(x)
 
