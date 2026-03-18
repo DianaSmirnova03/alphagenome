@@ -1,5 +1,5 @@
 
-## Описание файлов
+## Описание файлов (для head_mean и linear_head_*)
 
 ### `prepare_data.py`
 - Загружает GTF-аннотацию (GENCODE v39) с помощью `pyranges`.
@@ -29,8 +29,8 @@
 
 ### `register_head.py`
 - Регистрирует кастомную голову в системе `alphagenome_ft` под именем `'promoter_effect_head'` с конфигурацией:
-  - `num_tracks=1` (одно скалярное значение)
-  - `output_type=OutputType.RNA_SEQ` (подходящий тип для числовой регрессии)
+  - `num_tracks=1`  
+  - `output_type=OutputType.RNA_SEQ` 
   - пустые метаданные
 
 ### `create_model.py`
