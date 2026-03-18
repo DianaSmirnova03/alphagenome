@@ -16,4 +16,3 @@ register_custom_head(
         metadata={'hidden_size': 256}
     )
 )
-print("Голова 'promoter_effect_head' зарегистрирована.")
