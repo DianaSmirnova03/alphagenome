@@ -15,9 +15,9 @@ register_custom_head(
         output_type=dna_output.OutputType.RNA_SEQ,
         num_tracks=1,
         metadata={
-            'lora_rank': 8,                   
+            'lora_rank': 4,                   
             'lora_alpha': 8,                   
-            'dropout_rate': 0                   
+            'dropout_rate': 0.3                   
         }
     )
 )
