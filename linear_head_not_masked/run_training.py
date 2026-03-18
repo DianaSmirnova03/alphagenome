@@ -1,4 +1,3 @@
-# run_training.py
 import jax
 import optax
 from pathlib import Path

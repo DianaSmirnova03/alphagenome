@@ -1,1 +1,0 @@
-{"array_metadatas": [{"array_metadata": {"param_name": "0.head/promoter_effect_head/~predict/output.b", "write_shape": [970], "chunk_shape": [970], "ext_metadata": null}}, {"array_metadata": {"param_name": "0.head/promoter_effect_head/~predict/output.w", "write_shape": [1536, 970], "chunk_shape": [1536, 970], "ext_metadata": null}}]}

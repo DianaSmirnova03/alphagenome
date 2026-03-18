@@ -14,16 +14,16 @@ class PromoterEffectHead(CustomHead):
         x = embeddings.get_sequence_embeddings(resolution=1)
         # this is with masking exons predict
 
-        if gene_mask is not None:
-            masked = x * gene_mask[..., None]
-            sum_masked = jnp.sum(masked, axis=1)
-            mask_sum = jnp.sum(gene_mask, axis=1, keepdims=True) + 1e-8
-            x_agg = sum_masked / mask_sum
-        else:
-            x_agg = jnp.mean(x, axis=1)
+        #if gene_mask is not None:
+        #    masked = x * gene_mask[..., None]
+        #    sum_masked = jnp.sum(masked, axis=1)
+        #    mask_sum = jnp.sum(gene_mask, axis=1, keepdims=True) + 1e-8
+        #    x_agg = sum_masked / mask_sum
+        #else:
+        #    x_agg = jnp.mean(x, axis=1)
 
        # this is simple without masking predict
-       # x_agg = jnp.mean(x, axis=1)
+        x_agg = jnp.mean(x, axis=1)
         out = hk.Linear(1, name='output')(x_agg)
         return out
 
