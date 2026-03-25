@@ -1,5 +1,7 @@
 
 ## Описание файлов (для head_mean и linear_head_*)
+код заработай
+<img width="1200" height="577" alt="1682832020146128651" src="https://github.com/user-attachments/assets/06254cac-332c-4d8a-b1f5-630ab62d8064" />
 
 ### `prepare_data.py`
 - Загружает GTF-аннотацию (GENCODE v39) с помощью `pyranges`.
