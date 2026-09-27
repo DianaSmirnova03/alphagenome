@@ -11,13 +11,7 @@
 
 ![Train loss и val Pearson r](analysis/train_curve.png)
 
-Слева — train loss (Huber на `z`): сходится за ~10 эпох и дальше плавно
-дожимается. Справа — Pearson r на валидации: растёт с 0.24 до пика **0.292**
-на эпохе 23 (отмечен красной точкой) и дальше колеблется в диапазоне
-0.26–0.29, **не деградируя** к нулю/шуму, как во всех старых попытках
-(`AG/linear_head_masked`: 0.20→0.15, `AG/head_mean`: 0.16→0.09,
-`AG/head_tracks_970`: 0.16→0.13). Ранняя остановка сохраняет именно чекпоинт
-с эпохи 23, а не последнюю эпоху.
+Train loss (Huber) и val Pearson r по эпохам (TensorBoard → `make_figures.py`). Красная точка — лучшая эпоха по val r (**0.291**, early stopping).
 
 ### Валидация: предсказание vs истина
 
@@ -32,18 +26,16 @@
 совпадает с тем, что показывает сам AlphaGenome на public-бенчмарках для
 подобных задач.
 
-### Тест (`tableS1A.tsv`, held-out): классификация over/under/none
+### Тест (`tableS1A.tsv`, held-out)
 
-![ROC-кривые](analysis/test_roc.png)
-![KDE предсказанного эффекта по классам](analysis/test_kde.png)
+![ROC](analysis/test_roc.png)
+![PR](analysis/test_pr.png)
+![KDE by class](analysis/test_kde.png)
+![Calibration P(over)](analysis/test_calibration_over.png)
+![RF vs EffectHead AUC](analysis/test_auc_rf_vs_head.png)
+![Metrics summary](analysis/metrics_card.png)
 
-ROC-кривые (AUC over vs none = **0.810**, under vs none = **0.779**, over vs
-under = **0.914**; пересчитано `evaluate.py` / `report_test_metrics.py` на
-чекпоинте `runs/effect_head_v1/best.pkl`) и распределение предсказанного `ẑ` по истинному классу:
-класс `none` (n=382) резко сконцентрирован около нуля (модель верно не видит
-эффекта там, где его и не должно быть), `over`/`under` (n=161/206) заметно
-смещены и растянуты в свою сторону — модель различает не только «есть
-эффект/нет эффекта», но и его направление.
+AUC (test, n=749): over/none **0.810**, under/none **0.779**, over/under **0.914**. RF — диапазоны из `AG/rf.py` (3 runs).
 
 ### Сравнение со старыми результатами
 
@@ -57,18 +49,17 @@ under = **0.914**; пересчитано `evaluate.py` / `report_test_metrics.p
 Полная сводка val/test (JSON): [`results_test_metrics.json`](results_test_metrics.json).
 На **test** (`tableS1A`, n=749) метки **`consequence`** (over/under/none); колонка **`z` отсутствует** — регрессия по `z` только на val.
 
-### Дополнительные графики качества
+### Дополнительно (val)
 
-![Остатки регрессии на val](analysis/promoter_val_residual.png)
-![Распределение ẑ по классу на test](analysis/promoter_test_violin_by_class.png)
+![Val scatter](analysis/val_scatter.png)
+![Val residual](analysis/val_residual.png)
 
-Пересчёт метрик и PNG:
+Пересчёт всех PNG:
 
 ```bash
 export JAX_PLATFORMS=cpu
+python make_figures.py --task promoter --promoter-out analysis
 python report_test_metrics.py --out-dir results_eval
-python evaluate.py --features-dir features --checkpoint runs/effect_head_v1/best.pkl
-python analyze_results.py --features-dir features --checkpoint runs/effect_head_v1/best.pkl --out-dir analysis
 ```
 
 Вывод: новый пайплайн — единственный из всех попыток, который дал

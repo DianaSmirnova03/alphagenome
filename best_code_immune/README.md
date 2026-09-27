@@ -32,48 +32,31 @@ size из MIXALIME) и **`fdr_comb_pval`**, **37 типов иммунных к�
 > зависит от глубины покрытия и числа клеток/доноров, а не от ДНК-контекста.
 > В v2 aux-голова переобучена на **direction**, как в курсовой.
 
-### Обучение v2 (TensorBoard: `runs/effect_head_immune_v2/tensorboard`)
+### Обучение v2
 
-На валидации v2 дополнительно логирует `val/direction_auc` и
-`val/pearson_r_fdr_lt_0.05` — уверенные ASE-вызовы дают более честную
-оценку, чем смесь с шумными строками (~94% с FDR ≥ 0.05).
+![Train loss / val Pearson r](analysis_v2/train_curve.png)
 
-### Валидация: регрессия `comb_es` (v2)
+### Val / test (v2)
 
-![Scatter val v2](analysis_v2/val_scatter_immune_v2.png)
+![Val scatter](analysis_v2/val_scatter_immune_v2.png)
+![ROC direction](analysis_v2/test_roc_direction_v2.png)
+![PR direction, fdr<0.05](analysis_v2/test_pr_direction_fdr005.png)
+![Test scatter all](analysis_v2/test_scatter_all.png)
+![Test scatter fdr<0.05](analysis_v2/test_scatter_fdr005.png)
+![Pearson by cell type](analysis_v2/test_pearson_by_cell_type_v2.png)
+![Heatmap cell type](analysis_v2/test_heatmap_cell_type.png)
+![|comb_es| vs |pred|, fdr<0.05](analysis_v2/test_hist_abs_fdr005.png)
+![Metrics](analysis_v2/metrics_card.png)
 
-### Тест: ROC direction over/under (v2)
-
-![ROC direction v2](analysis_v2/test_roc_direction_v2.png)
-
-Синяя кривая — все строки (AUC ≈ 0.61); оранжевая — только **FDR &lt; 0.05**
-(AUC ≈ **0.77**, сопоставимо с RF из курсовой).
-
-### Pearson r по типам клеток (тест, v2)
-
-![Pearson by cell type v2](analysis_v2/test_pearson_by_cell_type_v2.png)
-
-### Held-out test: scatter регрессии (v2)
-
-![Test scatter all](analysis_v2/immune_v2_test_scatter_all.png)
-![Test scatter FDR<0.05](analysis_v2/immune_v2_test_scatter_fdr005.png)
-![Val vs test metrics](analysis_v2/immune_v2_metrics_summary.png)
-
-Сводка метрик (JSON, пересчитано на сервере): [`results_test_metrics.json`](results_test_metrics.json).
-В репозитории лежат готовые чекпоинты: `checkpoints/effect_head_immune_v2/best.pkl` (и v1 для сравнения).
-
-Пересчёт:
+JSON: [`results_test_metrics.json`](results_test_metrics.json). Чекпоинты: `checkpoints/effect_head_immune_v2/best.pkl`.
 
 ```bash
 export JAX_PLATFORMS=cpu
+python make_figures.py --task immune --immune-out analysis_v2
 python report_test_metrics.py --immune-features-dir features_immune --out-dir results_eval
-python evaluate_immune_v2.py --features-dir features_immune \
-  --checkpoint runs/effect_head_immune_v2/best.pkl --plots-dir analysis_v2
 ```
 
-Систематически выше на **B-клетках** (`memory_B_IGHMhi`, `B`, `naive_B`);
-на редких T-подтипах с малым *n* метрики нестабильны (шум, а не «отсутствие
-сигнала»).
+Выше на B-клетках Pearson обычно выше; на редких T-подтипах с малым *n* метрики нестабильны.
 
 ### Сравнение с v1 (та же экстракция признаков, другой loss)
 
@@ -236,7 +219,8 @@ tensorboard --logdir runs/effect_head_immune_v2/tensorboard --bind_all --port 60
 | `run_immune.sh`, `run_immune_v2.sh` | оркестрация |
 | `analysis/`, `analysis_v2/` | PNG с результатов прогона на сервере |
 | `results_test_metrics.json` | val/test метрики (JSON) |
-| `report_test_metrics.py` | пересчёт метрик + доп. графики |
+| `make_figures.py` | train/test figures |
+| `report_test_metrics.py` | JSON metrics |
 | `checkpoints/effect_head_immune_v*/best.pkl` | обученные чекпоинты (v1 baseline, **v2** основной) |
 
 ---
