@@ -46,138 +46,38 @@ python evaluate_immune.py --features-dir features_immune \
 
 ---
 
-## Описание графиков v2 (`analysis_v2/`)
+## Графики v2 и выводы (`analysis_v2/`)
 
-#### `train_curve.png`
+<table>
+<tr>
+<td width="33%" valign="top"><img src="analysis_v2/train_curve.png" alt="train_curve" width="100%"/><br/><strong>train_curve.png</strong><br/><strong>Что:</strong> train loss (Huber + FDR-веса) и val Pearson r; красная точка — best epoch.<br/><strong>Как:</strong> TensorBoard v2 → <code>make_figures.py</code>.<br/><strong>Вывод:</strong> val r ~0.14→~0.33 к best; early stop epoch 47 без обвала после плато.</td>
+<td width="33%" valign="top"><img src="analysis_v2/val_scatter_immune_v2.png" alt="val_scatter" width="100%"/><br/><strong>val_scatter_immune_v2.png</strong><br/><strong>Что:</strong> <code>comb_es</code> vs pred на chr14 (4497 строк).<br/><strong>Как:</strong> val-маска chr14, checkpoint v2.<br/><strong>Вывод:</strong> r ≈ 0.33; большой разброс из-за 37 cell types и шумных FDR.</td>
+<td width="33%" valign="top"><img src="analysis_v2/test_roc_direction_v2.png" alt="test_roc" width="100%"/><br/><strong>test_roc_direction_v2.png</strong><br/><strong>Что:</strong> ROC direction (знак <code>comb_es</code>) на test: all vs FDR&lt;0.05.<br/><strong>Как:</strong> <code>test_features.npz</code>; <code>make_figures.py</code>.<br/><strong>Вывод:</strong> AUC ~0.61 (all) vs **~0.77** (FDR&lt;0.05) — на par с RF курсовой (0.763).</td>
+</tr>
+<tr>
+<td width="33%" valign="top"><img src="analysis_v2/test_pr_direction_fdr005.png" alt="test_pr" width="100%"/><br/><strong>test_pr_direction_fdr005.png</strong><br/><strong>Что:</strong> PR для direction только FDR&lt;0.05 (n≈1072).<br/><strong>Как:</strong> <code>make_figures.py</code>.<br/><strong>Вывод:</strong> компромисс precision/recall; AP согласуется с AUC direction на subset.</td>
+<td width="33%" valign="top"><img src="analysis_v2/test_scatter_all.png" alt="test_scatter_all" width="100%"/><br/><strong>test_scatter_all.png</strong><br/><strong>Что:</strong> scatter <code>comb_es</code> vs pred, все 18766 строк test.<br/><strong>Как:</strong> <code>make_figures.py</code>.<br/><strong>Вывод:</strong> r ≈ 0.19 — много строк с ненадёжной ASE-меткой.</td>
+<td width="33%" valign="top"><img src="analysis_v2/test_scatter_fdr005.png" alt="test_scatter_fdr" width="100%"/><br/><strong>test_scatter_fdr005.png</strong><br/><strong>Что:</strong> тот же scatter только FDR&lt;0.05.<br/><strong>Как:</strong> <code>make_figures.py</code>.<br/><strong>Вывод:</strong> r ≈ **0.33** — модель полезнее там, где метка достовернее.</td>
+</tr>
+<tr>
+<td width="33%" valign="top"><img src="analysis_v2/test_pearson_by_cell_type_v2.png" alt="pearson_by_ct" width="100%"/><br/><strong>test_pearson_by_cell_type_v2.png</strong><br/><strong>Что:</strong> bar Pearson r по <code>cell_type</code> (n≥10).<br/><strong>Как:</strong> группировка test; как <code>evaluate_immune_v2.py</code>.<br/><strong>Вывод:</strong> B-клетки выше; редкие T-подтипы нестабильны из-за малого n.</td>
+<td width="33%" valign="top"><img src="analysis_v2/test_heatmap_cell_type.png" alt="heatmap" width="100%"/><br/><strong>test_heatmap_cell_type.png</strong><br/><strong>Что:</strong> heatmap: cell type × (r, direction AUC).<br/><strong>Как:</strong> та же таблица; <code>make_figures.py</code>.<br/><strong>Вывод:</strong> видно, где ловится знак (AUC) vs слабая регрессия величины (r).</td>
+<td width="33%" valign="top"><img src="analysis_v2/test_hist_abs_fdr005.png" alt="hist_abs" width="100%"/><br/><strong>test_hist_abs_fdr005.png</strong><br/><strong>Что:</strong> density |<code>comb_es</code>| vs |pred| при FDR&lt;0.05.<br/><strong>Как:</strong> <code>make_figures.py</code>.<br/><strong>Вывод:</strong> pred сжимает хвосты (regression to mean), порядок величин согласован.</td>
+</tr>
+<tr>
+<td width="33%" valign="top"><img src="analysis_v2/metrics_card.png" alt="metrics_card" width="100%"/><br/><strong>metrics_card.png</strong><br/><strong>Что:</strong> сводка val/test из JSON.<br/><strong>Как:</strong> <code>report_test_metrics.py</code> + <code>make_figures.py</code>.<br/><strong>Вывод:</strong> контроль цифр README одной картинкой.</td>
+</tr>
+</table>
 
-**Содержание:** train loss (Huber + веса FDR в v2) и val Pearson r по эпохам; красная точка — best epoch.
+## Графики v1 и выводы (`analysis/`)
 
-**Как получен:** TensorBoard `runs/effect_head_immune_v2/tensorboard` → `make_figures.py`.
-
-**Вывод:** val r растёт с ~0.14 до ~0.33 к best epoch; резкого падения после плато нет (early stop на epoch 47).
-
----
-
-#### `val_scatter_immune_v2.png`
-
-**Содержание:** истинный `comb_es` vs предсказание на **chr14** (4497 строк).
-
-**Как получен:** `train_all_features.npz`, маска хромосомы 14; checkpoint v2; `make_figures.py`.
-
-**Вывод:** r ≈ 0.33 на val; разброс больше, чем у «идеальной» регрессии — смесь cell types и шумные FDR.
-
----
-
-#### `test_roc_direction_v2.png`
-
-**Содержание:** ROC для бинарной **direction** (знак `comb_es`: over/under) на **chr_test.h5**; две кривые — все строки и только FDR &lt; 0.05.
-
-**Как получен:** `test_features.npz`; `make_figures.py`.
-
-**Вывод:** AUC ≈ 0.61 (all) vs **≈ 0.77** (FDR&lt;0.05) — на надёжных ASE-вызовах модель сравнима с RF из курсовой (0.763).
-
----
-
-#### `test_pr_direction_fdr005.png`
-
-**Содержание:** precision–recall для direction только на подмножестве FDR &lt; 0.05 (n≈1072).
-
-**Как получен:** `make_figures.py`.
-
-**Вывод:** PR показывает компромисс precision/recall при редком «чистом» классе; AP согласуется с AUC direction на том же subset.
-
----
-
-#### `test_scatter_all.png` / `test_scatter_fdr005.png`
-
-**Содержание:** scatter `comb_es` vs pred на test: все 18766 строк / только FDR&lt;0.05.
-
-**Как получен:** `make_figures.py`.
-
-**Вывод:** на all r ≈ 0.19 (много шумных меток); на FDR&lt;0.05 r ≈ **0.33** — модель полезна там, где метка ASE достовернее.
-
----
-
-#### `test_pearson_by_cell_type_v2.png`
-
-**Содержание:** горизонтальный bar — Pearson r на test отдельно по `cell_type` (n≥10).
-
-**Как получен:** группировка test по индексу cell type; `make_figures.py` / логика `evaluate_immune_v2.py`.
-
-**Вывод:** B-линия (memory_B, naive_B) обычно выше; редкие T-подтипы — нестабильны из-за малого n, не обязательно «нет биологии».
-
----
-
-#### `test_heatmap_cell_type.png`
-
-**Содержание:** heatmap: строки — cell types, столбцы — Pearson r и direction AUC на test.
-
-**Как получен:** та же таблица, что для bar; `make_figures.py`.
-
-**Вывод:** видно, где модель ловит **знак** (AUC), а где только слабую регрессию величины (r).
-
----
-
-#### `test_hist_abs_fdr005.png`
-
-**Содержание:** наложенные гистограммы |`comb_es`| и |pred| на test при FDR&lt;0.05 (density).
-
-**Как получен:** `make_figures.py`.
-
-**Вывод:** pred сжимает хвосты относительно truth (регрессия к среднему), но распределения по порядку величины согласованы.
-
----
-
-#### `metrics_card.png`
-
-**Содержание:** краткая текстовая сводка val/test из JSON.
-
-**Как получен:** `report_test_metrics.py` + `make_figures.py`.
-
-**Вывод:** контроль цифр README одной картинкой.
-
----
-
-## Описание графиков v1 (`analysis/`)
-
-#### `val_scatter_immune.png`
-
-**Содержание:** val chr14, pred vs `comb_es` для **v1** (aux на `is_sig`, без FDR-весов).
-
-**Как получен:** `evaluate_immune.py` + `checkpoints/effect_head_immune_v1/best.pkl`.
-
-**Вывод:** val Pearson all чуть **выше**, чем у v2 (≈0.34), но постановка aux некорректна для сравнения с курсовой.
-
----
-
-#### `test_roc_immune.png`
-
-**Содержание:** ROC «значимость ASE» (|pred| vs FDR&lt;0.05) на test — **не** direction.
-
-**Как получен:** `evaluate_immune.py`.
-
-**Вывод:** AUC ~0.52 — около случайного; **не использовать** как главную метрику (FDR не предсказывается из seq).
-
----
-
-#### `test_pearson_by_cell_type.png`
-
-**Содержание:** Pearson r по cell types на test для v1.
-
-**Как получен:** `evaluate_immune.py`.
-
-**Вывод:** та же heterogeneity по клеткам, что у v2; абсолютные r не сопоставимы напрямую с v2 без одного loss.
-
----
-
-### Галерея v2
-
-| | | |
-|:---:|:---:|:---:|
-| [train](analysis_v2/train_curve.png) | [val](analysis_v2/val_scatter_immune_v2.png) | [ROC dir](analysis_v2/test_roc_direction_v2.png) |
-| [PR dir](analysis_v2/test_pr_direction_fdr005.png) | [test all](analysis_v2/test_scatter_all.png) | [test fdr](analysis_v2/test_scatter_fdr005.png) |
-| [by CT](analysis_v2/test_pearson_by_cell_type_v2.png) | [heatmap](analysis_v2/test_heatmap_cell_type.png) | [hist abs](analysis_v2/test_hist_abs_fdr005.png) |
-| [metrics](analysis_v2/metrics_card.png) | | |
+<table>
+<tr>
+<td width="33%" valign="top"><img src="analysis/val_scatter_immune.png" alt="val_scatter_v1" width="100%"/><br/><strong>val_scatter_immune.png</strong><br/><strong>Что:</strong> chr14 val, pred vs <code>comb_es</code> для v1 (aux на <code>is_sig</code>).<br/><strong>Как:</strong> <code>evaluate_immune.py</code>, v1 checkpoint.<br/><strong>Вывод:</strong> val r all чуть выше v2 (~0.34), но aux некорректен для сравнения с курсовой.</td>
+<td width="33%" valign="top"><img src="analysis/test_roc_immune.png" alt="test_roc_v1" width="100%"/><br/><strong>test_roc_immune.png</strong><br/><strong>Что:</strong> ROC «значимость ASE» (|pred| vs FDR&lt;0.05), не direction.<br/><strong>Как:</strong> <code>evaluate_immune.py</code>.<br/><strong>Вывод:</strong> AUC ~0.52 — почти случайно; **не** главная метрика (FDR не из seq).</td>
+<td width="33%" valign="top"><img src="analysis/test_pearson_by_cell_type.png" alt="pearson_by_ct_v1" width="100%"/><br/><strong>test_pearson_by_cell_type.png</strong><br/><strong>Что:</strong> Pearson r по cell types на test (v1).<br/><strong>Как:</strong> <code>evaluate_immune.py</code>.<br/><strong>Вывод:</strong> та же heterogeneity, что у v2; r напрямую не сопоставимы без одного loss.</td>
+</tr>
+</table>
 
 ---
 
