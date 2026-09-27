@@ -4,7 +4,7 @@
 |-------|--------|------|
 | [`best_code`](best_code/) | Stage 2 promoter | EffectHead на offline LFC (npz) |
 | [`best_code_immune`](best_code_immune/) | Stage 2 immune | EffectHead v2 на offline LFC |
-| **[`best_finetune`](best_finetune/)** | **Stage 2.5 E2E** | **Тот же loss/голова, LFC онлайн, frozen AG** |
+| **[`best_finetune`](best_finetune/)** | **Stage 2.5 E2E** | **`finetune_promoter/` + `finetune_immune/` + `shared/`** |
 
 Подробности E2E, схема, warm-start и отличия от Stage 2 — в [`best_finetune/README.md`](best_finetune/README.md).
 
