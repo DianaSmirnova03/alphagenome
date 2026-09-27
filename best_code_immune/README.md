@@ -53,6 +53,24 @@ size из MIXALIME) и **`fdr_comb_pval`**, **37 типов иммунных к�
 
 ![Pearson by cell type v2](analysis_v2/test_pearson_by_cell_type_v2.png)
 
+### Held-out test: scatter регрессии (v2)
+
+![Test scatter all](analysis_v2/immune_v2_test_scatter_all.png)
+![Test scatter FDR<0.05](analysis_v2/immune_v2_test_scatter_fdr005.png)
+![Val vs test metrics](analysis_v2/immune_v2_metrics_summary.png)
+
+Сводка метрик (JSON, пересчитано на сервере): [`results_test_metrics.json`](results_test_metrics.json).
+В репозитории лежат готовые чекпоинты: `checkpoints/effect_head_immune_v2/best.pkl` (и v1 для сравнения).
+
+Пересчёт:
+
+```bash
+export JAX_PLATFORMS=cpu
+python report_test_metrics.py --immune-features-dir features_immune --out-dir results_eval
+python evaluate_immune_v2.py --features-dir features_immune \
+  --checkpoint runs/effect_head_immune_v2/best.pkl --plots-dir analysis_v2
+```
+
 Систематически выше на **B-клетках** (`memory_B_IGHMhi`, `B`, `naive_B`);
 на редких T-подтипах с малым *n* метрики нестабильны (шум, а не «отсутствие
 сигнала»).
@@ -217,6 +235,9 @@ tensorboard --logdir runs/effect_head_immune_v2/tensorboard --bind_all --port 60
 | `heads.py`, `common.py` | общие модули |
 | `run_immune.sh`, `run_immune_v2.sh` | оркестрация |
 | `analysis/`, `analysis_v2/` | PNG с результатов прогона на сервере |
+| `results_test_metrics.json` | val/test метрики (JSON) |
+| `report_test_metrics.py` | пересчёт метрик + доп. графики |
+| `checkpoints/effect_head_immune_v*/best.pkl` | обученные чекпоинты (v1 baseline, **v2** основной) |
 
 ---
 

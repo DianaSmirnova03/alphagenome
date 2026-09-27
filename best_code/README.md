@@ -37,8 +37,9 @@
 ![ROC-кривые](analysis/test_roc.png)
 ![KDE предсказанного эффекта по классам](analysis/test_kde.png)
 
-ROC-кривые (AUC over vs none = **0.801**, under vs none = **0.778**, over vs
-under = **0.909**) и распределение предсказанного `ẑ` по истинному классу:
+ROC-кривые (AUC over vs none = **0.810**, under vs none = **0.779**, over vs
+under = **0.914**; пересчитано `evaluate.py` / `report_test_metrics.py` на
+чекпоинте `runs/effect_head_v1/best.pkl`) и распределение предсказанного `ẑ` по истинному классу:
 класс `none` (n=382) резко сконцентрирован около нуля (модель верно не видит
 эффекта там, где его и не должно быть), `over`/`under` (n=161/206) заметно
 смещены и растянуты в свою сторону — модель различает не только «есть
@@ -51,7 +52,24 @@ under = **0.909**) и распределение предсказанного `�
 | `linear_head_masked`, `head_mean`, `head_tracks_970` (файнтюнинг, сырые эмбеддинги) | 0.16–0.20 → **деградирует** до 0.09–0.15 | — | — | — |
 | `lora_128`, `lora_970` (LoRA на весь backbone) | -0.02…0.08 (шум) / OOM | — | — | — |
 | Random Forest на LFC-эмбеддингах (`AG/rf.py`, 3 запуска) | не считался (только классификация) | 0.73–0.78 | 0.75–0.78 | 0.86–0.90 |
-| **Новый пайплайн (`EffectHead`, этот репозиторий)** | **0.292** (стабильно) | **0.801** | **0.778** | **0.909** |
+| **Новый пайплайн (`EffectHead`, этот репозиторий)** | **0.291** (val) | **0.810** | **0.779** | **0.914** |
+
+Полная сводка val/test (JSON): [`results_test_metrics.json`](results_test_metrics.json).
+На **test** (`tableS1A`, n=749) метки **`consequence`** (over/under/none); колонка **`z` отсутствует** — регрессия по `z` только на val.
+
+### Дополнительные графики качества
+
+![Остатки регрессии на val](analysis/promoter_val_residual.png)
+![Распределение ẑ по классу на test](analysis/promoter_test_violin_by_class.png)
+
+Пересчёт метрик и PNG:
+
+```bash
+export JAX_PLATFORMS=cpu
+python report_test_metrics.py --out-dir results_eval
+python evaluate.py --features-dir features --checkpoint runs/effect_head_v1/best.pkl
+python analyze_results.py --features-dir features --checkpoint runs/effect_head_v1/best.pkl --out-dir analysis
+```
 
 Вывод: новый пайплайн — единственный из всех попыток, который дал
 **неслучайную, не деградирующую регрессию** (`z`, Pearson r=0.29 против
