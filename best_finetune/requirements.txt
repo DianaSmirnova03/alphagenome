@@ -1,0 +1,19 @@
+# Эти пакеты уже установлены в conda-env `ag` (см. README). Список зафиксирован
+# для воспроизводимости / переноса на другую машину.
+alphagenome
+alphagenome_research
+jax
+jaxlib
+haiku
+optax
+chex
+jaxtyping
+dm-tree
+numpy
+pandas
+pyarrow
+pyranges
+scikit-learn
+scipy
+tqdm
+kagglehub

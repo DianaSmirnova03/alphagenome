@@ -1,0 +1,9 @@
+runs/
+__pycache__/
+*.pyc
+.analysis/
+analysis/
+analysis_v2/
+*.npz
+*.pkl
+tensorboard/
