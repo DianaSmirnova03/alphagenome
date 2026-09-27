@@ -27,6 +27,8 @@
 
 ## Формулы
 
+> На GitHub формулы пишутся через **`$$ … $$`** (блок) и **`$ … $`** (в строке). Ниже — в этом формате.
+
 ### Окно и маска
 
 - Длина окна: **W = 16 384** (параметр `--window`, в launch зафиксировано).
@@ -34,53 +36,58 @@
 
 ### LFC по GeneMask (как в `extract_features.py`)
 
-Для каждого RNA-трека \(t\) и батча вариантов:
+Для каждого RNA-трека $t$ и батча вариантов сначала суммируем предсказанную RNA-seq
+покрытость по позициям **gene mask** (только неотрицательные значения):
 
-\[
-S_{\mathrm{ref}}(t) = \sum_{i \in \mathrm{gene}} \max\bigl(R^{\mathrm{ref}}_{i,t}, 0\bigr), \quad
-S_{\mathrm{alt}}(t) = \sum_{i \in \mathrm{gene}} \max\bigl(R^{\mathrm{alt}}_{i,t}, 0\bigr)
-\]
+$$
+S_{\text{ref}}(t) = \sum_{i \in \text{gene}} \max(R^{\text{ref}}_{i,t},\, 0)
+$$
 
-\[
-\mathrm{LFC}(t) = \log(S_{\mathrm{alt}}(t) + \varepsilon) - \log(S_{\mathrm{ref}}(t) + \varepsilon),
-\quad \varepsilon = 10^{-3}
-\]
+$$
+S_{\text{alt}}(t) = \sum_{i \in \text{gene}} \max(R^{\text{alt}}_{i,t},\, 0)
+$$
 
-Далее \(\mathrm{LFC}\) обрезается и `nan` заменяются (`sanitize_lfc`, clip ±50 при подаче в голову).
+Log-fold-change по треку:
+
+$$
+\text{LFC}(t) = \log\bigl(S_{\text{alt}}(t) + \varepsilon\bigr) - \log\bigl(S_{\text{ref}}(t) + \varepsilon\bigr), \quad \varepsilon = 10^{-3}
+$$
+
+Далее LFC обрезается и `nan` заменяются (`sanitize_lfc`, clip ±50 при подаче в голову).
+
+**То же словами:** для каждого трека складываем ref/alt сигнал по экзону гена, берём log отношения alt/ref.
 
 ### Scaler (один раз на train)
 
 По всем train-строкам (после фильтра gene mask) собирается матрица сырого LFC и считаются
-по каждой координате:
+по каждой координате $j$:
 
-\[
-\tilde{x}_j = \mathrm{clip}\left(\frac{x_j - \mu_j}{\sigma_j}, -50, 50\right)
-\]
+$$
+\tilde{x}_j = \text{clip}\left( \frac{x_j - \mu_j}{\sigma_j},\, -50,\, 50 \right)
+$$
 
-\(\mu_j, \sigma_j\) сохраняются в `lfc_scaler.npz` в `--out-dir`.
+$\mu_j$, $\sigma_j$ сохраняются в `lfc_scaler.npz` в `--out-dir`.
 
 ### EffectHead
 
-\[
+$$
 \hat{z} = W_z\,\phi(W_2\,\phi(W_1\,\tilde{\mathbf{x}} + b_1) + b_2) + b_z
-\]
+$$
 
-где \(\phi\) — ReLU, dropout при train. Promoter E2E **не** использует aux-голову направления
+где $\phi$ — ReLU, dropout при train. Promoter E2E **не** использует aux-голову направления
 (в batch `p_over` = NaN).
 
 ### Loss (Huber)
 
-\[
-L_z = \frac{1}{|\mathcal{M}|} \sum_{i \in \mathcal{M}}
-\mathrm{Hubber}(\hat{z}_i - z_i), \quad
-\mathrm{Hubber}(r) =
-\begin{cases}
-\frac{1}{2} r^2 & |r| \le \delta \\
-\delta(|r| - \frac{1}{2}\delta) & |r| > \delta
-\end{cases}
-\]
+$$
+L_z = \frac{1}{|M|} \sum_{i \in M} \text{Huber}(\hat{z}_i - z_i)
+$$
 
-\(\delta = 1\), \(\mathcal{M}\) — строки с конечным \(z\).
+$$
+\text{Huber}(r) = \begin{cases} \tfrac{1}{2} r^2 & \text{если } |r| \le \delta \\ \delta\,(|r| - \tfrac{1}{2}\delta) & \text{если } |r| > \delta \end{cases}
+$$
+
+$\delta = 1$; $M$ — множество строк с конечным $z$.
 
 ---
 

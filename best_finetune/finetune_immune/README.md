@@ -28,45 +28,57 @@ Val — хромосома **14** (как Stage 2). Test — `chr_test.h5`.
 
 ## Формулы
 
+> На GitHub: **`$$ … $$`** — блок формулы, **`$ … $`** — в тексте (не `\[` `\]`).
+
 ### CenterMask LFC
 
-В окне center mask \(M\) (длина **2001** на оси, выровнена к предсказаниям модели):
+В окне center mask $M$ (ширина **2001** bp, выровнена к предсказаниям модели) для каждого трека $t$:
 
-\[
-S_{\mathrm{ref}}(t) = \sum_{i:\, M_i=1} \max(R^{\mathrm{ref}}_{i,t}, 0), \quad
-S_{\mathrm{alt}}(t) = \sum_{i:\, M_i=1} \max(R^{\mathrm{alt}}_{i,t}, 0)
-\]
+$$
+S_{\text{ref}}(t) = \sum_{i:\, M_i = 1} \max(R^{\text{ref}}_{i,t},\, 0)
+$$
 
-\[
-\mathrm{LFC}(t) = \log(S_{\mathrm{alt}}(t)+\varepsilon) - \log(S_{\mathrm{ref}}(t)+\varepsilon)
-\]
+$$
+S_{\text{alt}}(t) = \sum_{i:\, M_i = 1} \max(R^{\text{alt}}_{i,t},\, 0)
+$$
+
+$$
+\text{LFC}(t) = \log\bigl(S_{\text{alt}}(t)+\varepsilon\bigr) - \log\bigl(S_{\text{ref}}(t)+\varepsilon\bigr)
+$$
 
 Используются только треки с `valid_track_mask` из метаданных модели (как offline extract).
 
+**Словами:** суммируем ref/alt RNA только в центральном окне вокруг SNP, затем log-ratio alt/ref.
+
 ### Вход головы
 
-\[
-\mathbf{x} = \bigl[\,\tilde{\mathrm{LFC}}\,\|\,\mathrm{onehot}(\mathrm{cell\_type})\,\bigr],
-\quad \dim = |\mathrm{valid\_tracks}| + N_{\mathrm{types}}+1
-\]
+$$
+\mathbf{x} = \bigl[\, \tilde{\text{LFC}} \;\|\; \text{onehot}(\text{cell\_type}) \,\bigr]
+$$
+
+$$
+\dim(\mathbf{x}) = N_{\text{valid tracks}} + N_{\text{cell types}} + 1
+$$
+
+(last — unknown cell type).
 
 ### Loss v2
 
-Регрессия с весами \(w_i = f(\mathrm{fdr\_comb\_pval}_i)\) (чем увереннее ASE, тем больше вес):
+Регрессия с весами $w_i = f(\text{fdr\_comb\_pval}_i)$ (чем увереннее ASE, тем больше вес):
 
-\[
-L_z = \frac{\sum_i w_i \,\mathrm{Hubber}(\hat{z}_i - z_i)}{\sum_i w_i}
-\]
+$$
+L_z = \frac{\sum_i w_i \,\text{Huber}(\hat{z}_i - z_i)}{\sum_i w_i}
+$$
 
-Направление (если известно over/under):
+Направление (over vs under):
 
-\[
-L_{\mathrm{aux}} = \mathrm{BCEWithLogits}(\mathrm{logit\_over}, \mathbb{1}[\mathrm{direction}=\mathrm{over}])
-\]
+$$
+L_{\text{aux}} = \text{BCEWithLogits}(\text{logit\_over},\; \mathbb{1}[\text{direction}=\text{over}])
+$$
 
-\[
-L = L_z + \lambda_{\mathrm{aux}} L_{\mathrm{aux}}, \quad \lambda_{\mathrm{aux}} = 0.5
-\]
+$$
+L = L_z + \lambda_{\text{aux}}\, L_{\text{aux}}, \quad \lambda_{\text{aux}} = 0.5
+$$
 
 ---
 
