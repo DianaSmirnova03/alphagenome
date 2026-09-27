@@ -19,9 +19,20 @@
     }
   },
   "immune_v2": {
+    "version": "v2",
+    "checkpoint": "/mnt/calc/homes/d.smirnova/DIPLOM/alphagenome_snp_finetune/runs/effect_head_immune_v2/best.pkl",
     "val_chr14": {
       "pearson_r": 0.3292863667011261,
       "n": 4497
+    },
+    "test_chr_test_h5": {
+      "pearson_r_all": 0.18689683079719543,
+      "spearman_r_all": 0.2005140701149492,
+      "pearson_r_fdr_lt_0.05": 0.3304060399532318,
+      "direction_auc_all": 0.6076145589276025,
+      "direction_auc_fdr_lt_0.05": 0.7658289552077127,
+      "n_all": 18766,
+      "n_fdr_lt_0.05": 1072
     },
     "test": {
       "pearson_r_all": 0.18689683079719543,
