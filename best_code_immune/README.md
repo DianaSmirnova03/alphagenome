@@ -21,6 +21,31 @@ size из MIXALIME) и **`fdr_comb_pval`**, **37 типов иммунных к�
 | AUC direction (over/under), все | 0.601 | **0.608** | — |
 | **AUC direction, FDR &lt; 0.05** | 0.694 | **0.766** | **0.763** |
 
+### Сравнение v1 и v2 (та же модель, другой loss)
+
+Признаки и архитектура **одинаковые** (CenterMask LFC + one-hot `cell_type`, `EffectHead`).
+Меняются только скрипт обучения, веса строк и смысл aux-головы — см. таблицу ниже и
+[§ v1 vs v2 в коде](#4-исправления-v2-относительно-v1-без-смены-признаков).
+
+| Метрика | v1 | **v2** |
+|--------|-----|--------|
+| Val Pearson r (chr14, all) | **0.339** | 0.329 |
+| Val Pearson r (chr14, FDR &lt; 0.05) | **0.735** | ~0.62* |
+| Test Pearson r (all, n=18766) | 0.185 | **0.187** |
+| Test Pearson r (FDR &lt; 0.05) | 0.276 | **0.331** |
+| Test AUC direction (all) | 0.601 | **0.608** |
+| **Test AUC direction (FDR &lt; 0.05)** | 0.694 | **0.766** |
+| AUC «значимость ASE» (FDR, v1 eval) | **~0.52** (случайно) | не используется |
+
+\*На val v2 в TensorBoard отдельно логируется r на FDR&lt;0.05 (~0.62); у v1 на том же
+срезе r выше, но aux учит **`is_sig`**, а не direction — val «all» у v1 не делает v1 лучше
+для задачи курсовой.
+
+**Вывод:** для отчёта и сравнения с RF курсовой берите **v2** (`train_immune_v2.py`,
+`checkpoints/effect_head_immune_v2/best.pkl`, графики `analysis_v2/`). **v1** оставлен
+как baseline: показывает, почему aux на FDR и ROC «значимости ASE» (~0.52) — тупик;
+графики — `analysis/`.
+
 **Direction** — бинарная задача из курсовой: `comb_es > 0` → under,
 `comb_es < 0` → over (знак эффекта аллеля).
 
