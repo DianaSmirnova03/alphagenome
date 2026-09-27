@@ -7,35 +7,115 @@
 
 ## Результаты
 
-### Обучение головы (`EffectHead`)
+Сводка метрик: [`results_test_metrics.json`](results_test_metrics.json).  
+Чекпоинт для всех оценок: `runs/effect_head_v1/best.pkl`.  
+Признаки: `features/{train,val,test}_features.npz` (GeneMask LFC, 667 dim).  
+Пересчёт PNG: `make_figures.py --task promoter --promoter-out analysis` (нужен TensorBoard-лог в `runs/effect_head_v1/tensorboard`).
 
-![Train loss и val Pearson r](analysis/train_curve.png)
+### Таблица метрик
 
-Train loss (Huber) и val Pearson r по эпохам (TensorBoard → `make_figures.py`). Красная точка — лучшая эпоха по val r (**0.291**, early stopping).
+| Split | Метрика | Значение |
+|-------|---------|----------|
+| val (n=2044) | Pearson r (`z`) | **0.291** |
+| test (n=749) | AUC over / none | **0.810** |
+| test | AUC under / none | **0.779** |
+| test | AUC over / under | **0.914** |
 
-### Валидация: предсказание vs истина
+На test нет числового `z` — только класс `consequence` (over / under / none).
 
-![Scatter предсказание vs истина](analysis/val_scatter.png)
+---
 
-Каждая точка — один вариант из валидации. По оси X — истинный `z`, по Y —
-предсказание `EffectHead`. Видна реальная, статистически значимая линейная
-зависимость (Pearson r=0.292) — вариантам с большим по модулю истинным
-эффектом в среднем соответствует и большее по модулю предсказание, хотя
-разброс (шум измерения `z`, часть эффекта, которую видно только по
-экспрессии, а не по последовательности) остаётся большим — это ожидаемо и
-совпадает с тем, что показывает сам AlphaGenome на public-бенчмарках для
-подобных задач.
+## Описание графиков (`analysis/`)
 
-### Тест (`tableS1A.tsv`, held-out)
+#### `train_curve.png`
 
-![ROC](analysis/test_roc.png)
-![PR](analysis/test_pr.png)
-![KDE by class](analysis/test_kde.png)
-![Calibration P(over)](analysis/test_calibration_over.png)
-![RF vs EffectHead AUC](analysis/test_auc_rf_vs_head.png)
-![Metrics summary](analysis/metrics_card.png)
+**Содержание:** по оси X — номер эпохи; синяя кривая — средний train loss (Huber по `z`); оранжевая — Pearson r на val; красная точка — эпоха с максимальным val r (по ней сохранён `best.pkl`).
 
-AUC (test, n=749): over/none **0.810**, under/none **0.779**, over/under **0.914**. RF — диапазоны из `AG/rf.py` (3 runs).
+**Как получен:** скаляры `train/loss` и `val/pearson_r` из TensorBoard после `train.py`; рисует `make_figures.py`.
+
+**Вывод:** loss снижается без «взрыва»; val r выходит на плато ~0.26–0.29 и не обнуляется к концу обучения (в отличие от старых head на raw embeddings).
+
+---
+
+#### `val_scatter.png`
+
+**Содержание:** каждая точка — вариант из `val_features.npz`; оси: истинный `z` и предсказание EffectHead.
+
+**Как получен:** forward `best.pkl` на масштабированном LFC; `make_figures.py`.
+
+**Вывод:** есть слабая, но устойчивая линейная связь (r ≈ 0.29); большой разброс ожидаем — часть эффекта в `z` не кодируется одной последовательностью.
+
+---
+
+#### `val_residual.png`
+
+**Содержание:** остаток `pred − z` против истинного `z` на val.
+
+**Как получен:** те же предсказания, что для scatter; `make_figures.py`.
+
+**Вывод:** остатки не систематически U-образные; нет явного смещения только на больших |z|, модель не «залипает» в ноль.
+
+---
+
+#### `test_roc.png`
+
+**Содержание:** три ROC-кривые на held-out `tableS1A` (test): over vs none, under vs none, over vs under; score — предсказанный ẑ.
+
+**Как получен:** `test_features.npz`, метки `consequence`; `make_figures.py` (та же постановка, что `AG/rf.py` / `evaluate.py`).
+
+**Вывод:** все три AUC > 0.77; разделение направления over/under (0.91) сильнее, чем «эффект vs none».
+
+---
+
+#### `test_pr.png`
+
+**Содержание:** precision–recall для тех же трёх pairwise задач на test.
+
+**Как получен:** `make_figures.py`, sklearn `precision_recall_curve`.
+
+**Вывод:** при дисбалансе классов PR дополняет ROC; high-recall режим для over vs none достижим при умеренной precision (см. кривые на рисунке).
+
+---
+
+#### `test_kde.png`
+
+**Содержание:** нормированные гистограммы (density) предсказанного ẑ отдельно для классов none / over / under на test.
+
+**Как получен:** `make_figures.py`.
+
+**Вывод:** none сосредоточен около 0; over и under смещены в разные стороны — модель несёт информацию о знаке, не только о «наличии эффекта».
+
+---
+
+#### `test_calibration_over.png`
+
+**Содержание:** по decile среднего ẑ на test (ось X) — доля истинных `over` в этом decile (ось Y).
+
+**Как получен:** сортировка test по ẑ, 10 бинов; `make_figures.py`.
+
+**Вывод:** монотонный тренд «выше ẑ → чаще over» говорит о калиброванности знака score для класса over (грубая, без Platt scaling).
+
+---
+
+#### `test_auc_rf_vs_head.png`
+
+**Содержание:** столбцы AUC на test: RF (полоска ошибок — min/max по трём запускам из `AG/rf.py`) vs EffectHead (один столбец).
+
+**Как получен:** EffectHead — из текущего checkpoint; RF — фиксированные диапазоны из README/логов RF; `make_figures.py`.
+
+**Вывод:** EffectHead на том же типе LFC-признаков не хуже RF по всем трём парам; на over/under даже выше верхней границы RF.
+
+---
+
+#### `metrics_card.png`
+
+**Содержание:** текстовая сводка ключевых val/test метрик из `results_test_metrics.json`.
+
+**Как получен:** `make_figures.py` после `report_test_metrics.py`.
+
+**Вывод:** быстрая проверка цифр в README без запуска eval.
+
+---
 
 ### Сравнение со старыми результатами
 
@@ -46,23 +126,23 @@ AUC (test, n=749): over/none **0.810**, under/none **0.779**, over/under **0.914
 | Random Forest на LFC-эмбеддингах (`AG/rf.py`, 3 запуска) | не считался (только классификация) | 0.73–0.78 | 0.75–0.78 | 0.86–0.90 |
 | **Новый пайплайн (`EffectHead`, этот репозиторий)** | **0.291** (val) | **0.810** | **0.779** | **0.914** |
 
+### Галерея (клик — файл)
+
+| | | |
+|:---:|:---:|:---:|
+| [train](analysis/train_curve.png) | [val scatter](analysis/val_scatter.png) | [val residual](analysis/val_residual.png) |
+| [test ROC](analysis/test_roc.png) | [test PR](analysis/test_pr.png) | [test KDE](analysis/test_kde.png) |
+| [calibration](analysis/test_calibration_over.png) | [RF vs head](analysis/test_auc_rf_vs_head.png) | [metrics](analysis/metrics_card.png) |
+
 Полная сводка val/test (JSON): [`results_test_metrics.json`](results_test_metrics.json).
-На **test** (`tableS1A`, n=749) метки **`consequence`** (over/under/none); колонка **`z` отсутствует** — регрессия по `z` только на val.
-
-### Дополнительно (val)
-
-![Val scatter](analysis/val_scatter.png)
-![Val residual](analysis/val_residual.png)
-
-Пересчёт всех PNG:
 
 ```bash
 export JAX_PLATFORMS=cpu
-python make_figures.py --task promoter --promoter-out analysis
 python report_test_metrics.py --out-dir results_eval
+python make_figures.py --task promoter --promoter-out analysis
 ```
 
-Вывод: новый пайплайн — единственный из всех попыток, который дал
+Вывод по пайплайну:
 **неслучайную, не деградирующую регрессию** (`z`, Pearson r=0.29 против
 максимум 0.1–0.2 и последующего распада у всех вариантов файнтюнинга). При
 этом на классификации (over/under/none) — задаче, где раньше единственным

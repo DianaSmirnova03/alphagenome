@@ -32,36 +32,152 @@ size из MIXALIME) и **`fdr_comb_pval`**, **37 типов иммунных к�
 > зависит от глубины покрытия и числа клеток/доноров, а не от ДНК-контекста.
 > В v2 aux-голова переобучена на **direction**, как в курсовой.
 
-### Обучение v2
-
-![Train loss / val Pearson r](analysis_v2/train_curve.png)
-
-### Val / test (v2)
-
-![Val scatter](analysis_v2/val_scatter_immune_v2.png)
-![ROC direction](analysis_v2/test_roc_direction_v2.png)
-![PR direction, fdr<0.05](analysis_v2/test_pr_direction_fdr005.png)
-![Test scatter all](analysis_v2/test_scatter_all.png)
-![Test scatter fdr<0.05](analysis_v2/test_scatter_fdr005.png)
-![Pearson by cell type](analysis_v2/test_pearson_by_cell_type_v2.png)
-![Heatmap cell type](analysis_v2/test_heatmap_cell_type.png)
-![|comb_es| vs |pred|, fdr<0.05](analysis_v2/test_hist_abs_fdr005.png)
-![Metrics](analysis_v2/metrics_card.png)
-
-JSON: [`results_test_metrics.json`](results_test_metrics.json). Чекпоинты: `checkpoints/effect_head_immune_v2/best.pkl`.
+JSON: [`results_test_metrics.json`](results_test_metrics.json).  
+Чекпоинт v2: `checkpoints/effect_head_immune_v2/best.pkl` (v1 — `checkpoints/effect_head_immune_v1/best.pkl`).  
+Признаки: `features_immune/*_features.npz` (CenterMask LFC + `cell_type_idx` в Stage 2).
 
 ```bash
 export JAX_PLATFORMS=cpu
-python make_figures.py --task immune --immune-out analysis_v2
 python report_test_metrics.py --immune-features-dir features_immune --out-dir results_eval
+python make_figures.py --task immune --immune-out analysis_v2
+python evaluate_immune.py --features-dir features_immune \
+  --checkpoint checkpoints/effect_head_immune_v1/best.pkl --plots-dir analysis
 ```
 
-Выше на B-клетках Pearson обычно выше; на редких T-подтипах с малым *n* метрики нестабильны.
+---
 
-### Сравнение с v1 (та же экстракция признаков, другой loss)
+## Описание графиков v2 (`analysis_v2/`)
 
-![Scatter val v1](analysis/val_scatter_immune.png)
-![ROC v1 (метрика значимости — некорректна для сравнения с курсовой)](analysis/test_roc_immune.png)
+#### `train_curve.png`
+
+**Содержание:** train loss (Huber + веса FDR в v2) и val Pearson r по эпохам; красная точка — best epoch.
+
+**Как получен:** TensorBoard `runs/effect_head_immune_v2/tensorboard` → `make_figures.py`.
+
+**Вывод:** val r растёт с ~0.14 до ~0.33 к best epoch; резкого падения после плато нет (early stop на epoch 47).
+
+---
+
+#### `val_scatter_immune_v2.png`
+
+**Содержание:** истинный `comb_es` vs предсказание на **chr14** (4497 строк).
+
+**Как получен:** `train_all_features.npz`, маска хромосомы 14; checkpoint v2; `make_figures.py`.
+
+**Вывод:** r ≈ 0.33 на val; разброс больше, чем у «идеальной» регрессии — смесь cell types и шумные FDR.
+
+---
+
+#### `test_roc_direction_v2.png`
+
+**Содержание:** ROC для бинарной **direction** (знак `comb_es`: over/under) на **chr_test.h5**; две кривые — все строки и только FDR &lt; 0.05.
+
+**Как получен:** `test_features.npz`; `make_figures.py`.
+
+**Вывод:** AUC ≈ 0.61 (all) vs **≈ 0.77** (FDR&lt;0.05) — на надёжных ASE-вызовах модель сравнима с RF из курсовой (0.763).
+
+---
+
+#### `test_pr_direction_fdr005.png`
+
+**Содержание:** precision–recall для direction только на подмножестве FDR &lt; 0.05 (n≈1072).
+
+**Как получен:** `make_figures.py`.
+
+**Вывод:** PR показывает компромисс precision/recall при редком «чистом» классе; AP согласуется с AUC direction на том же subset.
+
+---
+
+#### `test_scatter_all.png` / `test_scatter_fdr005.png`
+
+**Содержание:** scatter `comb_es` vs pred на test: все 18766 строк / только FDR&lt;0.05.
+
+**Как получен:** `make_figures.py`.
+
+**Вывод:** на all r ≈ 0.19 (много шумных меток); на FDR&lt;0.05 r ≈ **0.33** — модель полезна там, где метка ASE достовернее.
+
+---
+
+#### `test_pearson_by_cell_type_v2.png`
+
+**Содержание:** горизонтальный bar — Pearson r на test отдельно по `cell_type` (n≥10).
+
+**Как получен:** группировка test по индексу cell type; `make_figures.py` / логика `evaluate_immune_v2.py`.
+
+**Вывод:** B-линия (memory_B, naive_B) обычно выше; редкие T-подтипы — нестабильны из-за малого n, не обязательно «нет биологии».
+
+---
+
+#### `test_heatmap_cell_type.png`
+
+**Содержание:** heatmap: строки — cell types, столбцы — Pearson r и direction AUC на test.
+
+**Как получен:** та же таблица, что для bar; `make_figures.py`.
+
+**Вывод:** видно, где модель ловит **знак** (AUC), а где только слабую регрессию величины (r).
+
+---
+
+#### `test_hist_abs_fdr005.png`
+
+**Содержание:** наложенные гистограммы |`comb_es`| и |pred| на test при FDR&lt;0.05 (density).
+
+**Как получен:** `make_figures.py`.
+
+**Вывод:** pred сжимает хвосты относительно truth (регрессия к среднему), но распределения по порядку величины согласованы.
+
+---
+
+#### `metrics_card.png`
+
+**Содержание:** краткая текстовая сводка val/test из JSON.
+
+**Как получен:** `report_test_metrics.py` + `make_figures.py`.
+
+**Вывод:** контроль цифр README одной картинкой.
+
+---
+
+## Описание графиков v1 (`analysis/`)
+
+#### `val_scatter_immune.png`
+
+**Содержание:** val chr14, pred vs `comb_es` для **v1** (aux на `is_sig`, без FDR-весов).
+
+**Как получен:** `evaluate_immune.py` + `checkpoints/effect_head_immune_v1/best.pkl`.
+
+**Вывод:** val Pearson all чуть **выше**, чем у v2 (≈0.34), но постановка aux некорректна для сравнения с курсовой.
+
+---
+
+#### `test_roc_immune.png`
+
+**Содержание:** ROC «значимость ASE» (|pred| vs FDR&lt;0.05) на test — **не** direction.
+
+**Как получен:** `evaluate_immune.py`.
+
+**Вывод:** AUC ~0.52 — около случайного; **не использовать** как главную метрику (FDR не предсказывается из seq).
+
+---
+
+#### `test_pearson_by_cell_type.png`
+
+**Содержание:** Pearson r по cell types на test для v1.
+
+**Как получен:** `evaluate_immune.py`.
+
+**Вывод:** та же heterogeneity по клеткам, что у v2; абсолютные r не сопоставимы напрямую с v2 без одного loss.
+
+---
+
+### Галерея v2
+
+| | | |
+|:---:|:---:|:---:|
+| [train](analysis_v2/train_curve.png) | [val](analysis_v2/val_scatter_immune_v2.png) | [ROC dir](analysis_v2/test_roc_direction_v2.png) |
+| [PR dir](analysis_v2/test_pr_direction_fdr005.png) | [test all](analysis_v2/test_scatter_all.png) | [test fdr](analysis_v2/test_scatter_fdr005.png) |
+| [by CT](analysis_v2/test_pearson_by_cell_type_v2.png) | [heatmap](analysis_v2/test_heatmap_cell_type.png) | [hist abs](analysis_v2/test_hist_abs_fdr005.png) |
+| [metrics](analysis_v2/metrics_card.png) | | |
 
 ---
 
