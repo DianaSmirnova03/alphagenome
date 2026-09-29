@@ -44,7 +44,6 @@ run_promoter() {
     --batch-size "$PROMOTER_BATCH" --val-batch-size "$PROMOTER_VAL_BATCH" \
     --scaler-batch-size "$PROMOTER_SCALER_BATCH" --lr "$LR" \
     2>&1 | tee "${RUNS}/e2e_head_promoter_v1.log"
-  export JAX_PLATFORMS=cpu
   python finetune_promoter/evaluate_e2e_promoter.py \
     --checkpoint "${RUNS}/e2e_head_promoter_v1/best.pkl" \
     --val-csv "${PROM_DATA}/val_variants1.csv" \
@@ -73,7 +72,6 @@ run_immune() {
     --head-checkpoint "$HEAD_I" \
     --window "$WINDOW" --batch-size "$IMMUNE_BATCH" --scaler-batch-size "$IMMUNE_SCALER_BATCH" --lr "$LR" \
     2>&1 | tee "${RUNS}/e2e_head_immune_v2.log"
-  export JAX_PLATFORMS=cpu
   python finetune_immune/evaluate_e2e_immune.py \
     --checkpoint "${RUNS}/e2e_head_immune_v2/best.pkl" \
     --train-h5 "$CHR_TRAIN" --test-h5 "$CHR_TEST" \

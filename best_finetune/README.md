@@ -14,10 +14,10 @@
 | [`tools/`](tools/) | `make_figures.py`, `report_test_metrics.py` |
 | [`launch_e2e_head_ft.sh`](launch_e2e_head_ft.sh) | Один скрипт: обучение + eval + PNG |
 
-**Подробные объяснения, формулы и сравнение со старыми подходами** — в README каждой задачи:
+Подробные **метрики, графики и подписи** (как в `best_code` / `best_code_immune`):
 
-- [finetune_promoter/README.md](finetune_promoter/README.md)
-- [finetune_immune/README.md](finetune_immune/README.md)
+- [finetune_promoter/README.md](finetune_promoter/README.md) — таблица + gallery `analysis/`
+- [finetune_immune/README.md](finetune_immune/README.md) — таблица E2E vs Stage 2 + gallery `analysis/`
 
 ## Связь со Stage 2 на GitHub
 

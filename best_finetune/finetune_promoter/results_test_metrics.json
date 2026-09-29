@@ -1,0 +1,22 @@
+{
+  "pipeline": "e2e_finetune_promoter",
+  "checkpoint": "runs/e2e_head_promoter_v1/best.pkl (local train; not shipped — regenerate via launch)",
+  "eval": "evaluate_e2e_promoter.py — val/test через frozen AlphaGenome + GeneMask LFC online",
+  "train_best_val_pearson_r": 0.2851,
+  "val": {
+    "pearson_r": 0.2853219211101532,
+    "n": 2044
+  },
+  "test": {
+    "n": 749,
+    "auc": {
+      "over_vs_none": 0.7833485089915776,
+      "under_vs_none": 0.7678226503329436,
+      "over_vs_under": 0.9019327021648677
+    }
+  },
+  "stage2_reference_best_code": {
+    "val_pearson_r": 0.291,
+    "test_auc_over_vs_none": 0.81
+  }
+}

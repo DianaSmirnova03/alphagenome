@@ -151,6 +151,45 @@ RF — отдельный классификатор на **тех же** LFC-п
 
 ---
 
+## Результаты E2E (held-out test + val)
+
+Сводка: [`results_test_metrics.json`](results_test_metrics.json).  
+Графики: [`analysis/`](analysis/) — `make_figures.py --e2e`.  
+Eval: `evaluate_e2e_promoter.py` (online forward, без npz).
+
+### Таблица метрик
+
+| Split | Метрика | **E2E** | Stage 2 [`best_code`](../best_code/) |
+|-------|---------|---------|--------------------------------------|
+| val (n=2044) | Pearson r | **0.285** | 0.291 |
+| test (n=749) | AUC over / none | **0.783** | 0.810 |
+| test | AUC under / none | **0.768** | 0.779 |
+| test | AUC over / under | **0.902** | 0.914 |
+
+---
+
+## Графики и выводы (`analysis/`)
+
+<table>
+<tr>
+<td width="33%" valign="top"><img src="analysis/train_curve.png" alt="train_curve" width="100%"/><p><strong>E2E обучение</strong></p><p>Train loss и val Pearson r по эпохам; early stop при best val r ≈ 0.285.</p><p>Поведение близко к Stage 2: плато val r без деградации.</p></td>
+<td width="33%" valign="top"><img src="analysis/val_scatter.png" alt="val_scatter" width="100%"/><p><strong>Val scatter (E2E forward)</strong></p><p>Истинный <code>z</code> vs pred; каждая точка — forward ref/alt через frozen AlphaGenome.</p><p>r ≈ 0.29; облако с наклоном, не шум.</p></td>
+<td width="33%" valign="top"><img src="analysis/val_residual.png" alt="val_residual" width="100%"/><p><strong>Остатки val</strong></p><p>pred − z; проверка систематического смещения.</p><p>Без выраженной U-формы.</p></td>
+</tr>
+<tr>
+<td width="33%" valign="top"><img src="analysis/test_roc.png" alt="test_roc" width="100%"/><p><strong>ROC test</strong></p><p><code>tableS1A</code>, три pairwise AUC по ẑ.</p><p>≈0.78 / 0.77 / 0.90 — чуть ниже Stage 2, тот же порядок.</p></td>
+<td width="33%" valign="top"><img src="analysis/test_pr.png" alt="test_pr" width="100%"/><p><strong>PR test</strong></p><p>Precision–recall для тех же задач.</p><p>Дополняет ROC при редких positive.</p></td>
+<td width="33%" valign="top"><img src="analysis/test_kde.png" alt="test_kde" width="100%"/><p><strong>KDE по классам</strong></p><p>Распределение ẑ для none / over / under.</p><p>Знак score согласован с consequence.</p></td>
+</tr>
+<tr>
+<td width="33%" valign="top"><img src="analysis/test_calibration_over.png" alt="calibration" width="100%"/><p><strong>Калибровка over</strong></p><p>Decile ẑ vs P(over).</p><p>Монотонный тренд.</p></td>
+<td width="33%" valign="top"><img src="analysis/test_auc_rf_vs_head.png" alt="rf_vs_head" width="100%"/><p><strong>vs Random Forest</strong></p><p>Сравнение AUC с RF из курсовой.</p><p>E2E голова остаётся на уровне RF.</p></td>
+<td width="33%" valign="top"><img src="analysis/metrics_card.png" alt="metrics_card" width="100%"/><p><strong>Сводка</strong></p><p>Числа из <code>results_test_metrics.json</code>.</p><p>Для слайда «итог E2E promoter».</p></td>
+</tr>
+</table>
+
+---
+
 ## Файлы в этой папке
 
 | Файл | Роль |

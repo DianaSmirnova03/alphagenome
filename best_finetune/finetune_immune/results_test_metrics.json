@@ -1,0 +1,24 @@
+{
+  "pipeline": "e2e_finetune_immune_v2",
+  "checkpoint": "runs/e2e_head_immune_v2/best.pkl (local train; not shipped — regenerate via launch)",
+  "eval": "evaluate_e2e_immune.py — val chr14 + chr_test.h5 через CenterMask LFC online",
+  "train_best_val_pearson_r": 0.1749,
+  "val_chr14": {
+    "pearson_r": 0.1706419289112091,
+    "n": 4497
+  },
+  "test_chr_test_h5": {
+    "pearson_r_all": 0.13598662614822388,
+    "pearson_r_fdr_lt_0.05": 0.2896122932434082,
+    "direction_auc_all": 0.5820128094682716,
+    "direction_auc_fdr_lt_0.05": 0.674944483561718,
+    "n_all": 18766,
+    "n_fdr_lt_0.05": 1072
+  },
+  "stage2_reference_best_code_immune": {
+    "val_pearson_r": 0.329,
+    "test_pearson_r_all": 0.187,
+    "test_pearson_r_fdr_lt_0.05": 0.331,
+    "test_direction_auc_fdr_lt_0.05": 0.766
+  }
+}
