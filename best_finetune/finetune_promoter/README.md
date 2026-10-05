@@ -7,6 +7,34 @@
 > с графиками и выводами. В конце — подробный разбор с формулами для тех, кто будет читать код.
 > Парная папка для иммунных данных: [`../finetune_immune/`](../finetune_immune/README.md).
 
+## Общая схема каталога `best_finetune`
+
+Две параллельные ветки — **промоторы** (эта папка) и **иммунные ASE** ([`finetune_immune/`](../finetune_immune/README.md)).
+Общий код — [`../shared/`](../shared/), графики — [`../tools/make_figures.py`](../tools/make_figures.py),
+запуск на calc — [`../launch_e2e_head_ft.sh`](../launch_e2e_head_ft.sh).
+
+```mermaid
+flowchart LR
+  subgraph step1 ["Шаг 1 — голова на готовых признаках"]
+    EX["extract_features*"] --> NPZ["файлы npz X"]
+    NPZ --> TR["train*.py"]
+    TR --> PKL["best.pkl"]
+  end
+  subgraph step2 ["Шаг 2 — дообучение с горячим стартом (эта ветка)"]
+    DATA["CSV / h5 + FASTA"] --> AG["AlphaGenome заморожена"]
+    AG --> LFC["LFC на лету"]
+    LFC --> HD["EffectHead"]
+    PKL -.->|"только веса MLP"| HD
+  end
+```
+
+| Папка | Данные | Признак X |
+|-------|--------|-----------|
+| [`best_code`](../../best_code/README.md) | CSV + GTF | GeneMask LFC в npz |
+| **finetune_promoter** | CSV + FASTA + GTF | GeneMask LFC online |
+| [`best_code_immune`](../../best_code_immune/README.md) | `chr_train.h5` | CenterMask LFC + cell type в npz |
+| [`finetune_immune`](../finetune_immune/README.md) | h5 + FASTA | CenterMask LFC online + cell type |
+
 ---
 
 ## Коротко (5 минут)
