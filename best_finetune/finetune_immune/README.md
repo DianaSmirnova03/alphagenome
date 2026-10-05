@@ -90,7 +90,7 @@ flowchart LR
 </tr>
 <tr>
 <td width="33%" valign="top"><img src="analysis/test_pr_direction_fdr005.png" alt="test_pr" width="100%"/><p><strong>Precision–recall (FDR &lt; 0.05)</strong></p><p>Дополнение к ROC для редких positive по direction.</p></td>
-<td width="33%" valign="top"><img src="analysis/test_scatter_all.png" alt="scatter_all" width="100%"/><p><strong>Test scatter (all)</strong></p><p>~18k строк; r ≈ 0.14 (шаг 1 ~0.19).</p></td>
+<td width="33%" valign="top"><img src="analysis/test_scatter_all.png" alt="scatter_all" width="100%"/><p><strong>Test scatter</strong></p><p>~18k строк; r ≈ 0.14 (просто обучения MLP ~0.19).</p></td>
 <td width="33%" valign="top"><img src="analysis/test_scatter_fdr005.png" alt="scatter_fdr" width="100%"/><p><strong>Test FDR &lt; 0.05</strong></p><p>r ≈ 0.29 — ближе к просто обучению MLP (0.33)</p></td>
 </tr>
 <tr>
