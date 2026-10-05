@@ -14,7 +14,7 @@ from common import build_differentiable_apply_fn, get_rna_seq_valid_mask, load_a
 from e2e_lfc import compute_rna_lfc_center_mask, sanitize_lfc
 from extract_features_immune import _load_h5
 from finetune_e2e_head_immune import _cell_type_indices
-from finetune_lora_immune import _dedupe_batch_by_variant
+from e2e_batch_utils import dedupe_batch_by_variant as _dedupe_batch_by_variant
 from heads import forward
 from immune_sequence_loader import ImmuneSequenceLoader
 from train_immune import pearson_r, spearman_r

@@ -15,9 +15,10 @@ from scipy import stats
 from common import build_differentiable_apply_fn, get_rna_seq_valid_mask, load_alphagenome_model
 from e2e_lfc import compute_rna_lfc_gene_mask, sanitize_lfc
 from evaluate import LABEL_MAP, auc_pair
-from extract_features import CONSEQUENCE_TO_LABEL
 from heads import forward
 from promoter_sequence_loader import filter_promoter_rows, load_promoter_csv, PromoterSequenceLoader
+
+CONSEQUENCE_TO_LABEL = LABEL_MAP
 
 
 def load_head(checkpoint: str):
