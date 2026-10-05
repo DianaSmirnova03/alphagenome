@@ -372,7 +372,7 @@ flowchart LR
 матрицы $W \times 4$.
 
 **Предсказание AlphaGenome.** Для ref и alt модель выдаёт RNA-сигнал с разрешением 1 п.н.:
-$R^{\mathrm{ref}}_{i,t}$ и $R^{\mathrm{alt}}_{i,t}$, где $i$ — позиция в окне, $t$ — RNA-трек.
+$R^{\text{ref}}_{i,t}$ и $R^{\text{alt}}_{i,t}$, где $i$ — позиция в окне, $t$ — RNA-трек.
 Берутся только реальные треки (не служебные заглушки) — их $T = 667$. Отрицательные значения
 обнуляются: $R \leftarrow \max(R, 0)$.
 
@@ -422,13 +422,15 @@ $$
 **Функция ошибки — Huber** с $\delta = 1$, среднее по строкам с известным $z$:
 
 $$
-\operatorname{Huber}(r) =
-\begin{cases}
+\mathrm{Huber}(r) =
+\left\{
+\begin{array}{ll}
 \frac{1}{2} r^2, & |r| \le \delta \\
 \delta \left(|r| - \frac{1}{2}\delta\right), & |r| > \delta
-\end{cases}
+\end{array}
+\right.
 \qquad
-L = \frac{1}{B} \sum_{n=1}^{B} \operatorname{Huber}\left(\hat{z}_n - z_n\right)
+L = \frac{1}{B} \sum_{n=1}^{B} \mathrm{Huber}\left(\hat{z}_n - z_n\right)
 $$
 
 Малые ошибки штрафуются квадратично, большие — линейно, поэтому редкие варианты с огромным $|z|$
