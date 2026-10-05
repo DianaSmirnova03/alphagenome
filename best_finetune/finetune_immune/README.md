@@ -1,4 +1,4 @@
-# Иммунные ASE: дообучение головы AlphaGenome с горячим стартом
+# Иммунные ASE: дообучение головы AlphaGenome
 
 Предсказание **allele-specific expression (ASE)** по данным AIDA: для пары «SNP + тип иммунной клетки»
 модель оценивает **combined effect size** (`comb_es`) 
