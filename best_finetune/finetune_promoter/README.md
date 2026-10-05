@@ -402,7 +402,7 @@ $$
 $$
 
 $$
-\tilde{x}_t = \operatorname{clip}\left(\frac{x_t - \mu_t}{\sigma_t},\; -50,\; 50\right)
+\tilde{x}_t = \mathrm{clip}\left(\frac{x_t - \mu_t}{\sigma_t},\; -50,\; 50\right)
 $$
 
 Если $\sigma_t < 10^{-6}$ (трек почти постоянен), берётся $\sigma_t = 1$.
