@@ -81,19 +81,17 @@ flowchart LR
 | **Шаг 2 горячий старт** (эта папка) | 0.171 | 0.675 |  
  
 ### Графики
-
-> PNG генерируются `make_figures.py --e2e` в `analysis/` (или `analysis_v2/` при launch — скопируйте в `analysis/` для README).
-
+ 
 <table>
 <tr>
-<td width="33%" valign="top"><img src="analysis/train_curve.png" alt="train_curve" width="100%"/><p><strong>Кривая дообучения (шаг 2)</strong></p><p>Синяя — train loss (Huber + FDR-веса + direction aux), оранжевая — val Pearson на chr14. Красная точка — лучшая эпоха (~46, r ≈ 0.175).</p><p>Плато ниже шага 1 (~0.33): online LFC и batch=2 дают шумный val; обвала как в курсовых embedding-головах нет.</p></td>
-<td width="33%" valign="top"><img src="analysis/val_scatter_immune_v2.png" alt="val_scatter" width="100%"/><p><strong>Val chr14: comb_es vs pred</strong></p><p>4497 строк, все cell types; предсказание через GPU-forward, не npz.</p><p>r ≈ 0.17 — слабее шага 1 (~0.33), но наклон «больше effect → выше pred» сохраняется.</p></td>
-<td width="33%" valign="top"><img src="analysis/test_roc_direction_v2.png" alt="test_roc" width="100%"/><p><strong>ROC direction на test</strong></p><p>Over vs under, score = pred. Кривые: все строки и FDR &lt; 0.05.</p><p>AUC FDR&lt;0.05 ≈ 0.67 vs 0.77 у шага 1 и ~0.76 у курсовой RF — знак ловится, но слабее.</p></td>
+<td width="33%" valign="top"><img src="analysis/train_curve.png" alt="train_curve" width="100%"/><p><strong>Кривая дообучения (шаг 2)</strong></p><p>Синяя — train loss (Huber + FDR-веса + direction aux), оранжевая — val Pearson на chr14. Красная точка — лучшая эпоха (~46, r ≈ 0.175).</p></td>
+<td width="33%" valign="top"><img src="analysis/val_scatter_immune_v2.png" alt="val_scatter" width="100%"/><p><strong>Val chr14: comb_es vs pred</strong></p><p>4497 строк, все cell types; r ≈ 0.17 — слабее просто обучения MLP (~0.33)</p></td>
+<td width="33%" valign="top"><img src="analysis/test_roc_direction_v2.png" alt="test_roc" width="100%"/><p><strong>ROC direction на test</strong></p><p>Over vs under, score = pred. Кривые: все строки и FDR &lt; 0.05.</p><p>AUC FDR&lt;0.05 ≈ 0.67 vs 0.77 у просто обучения MLP и ~0.76 у курсовой RF</p></td>
 </tr>
 <tr>
 <td width="33%" valign="top"><img src="analysis/test_pr_direction_fdr005.png" alt="test_pr" width="100%"/><p><strong>Precision–recall (FDR &lt; 0.05)</strong></p><p>Дополнение к ROC для редких positive по direction.</p></td>
 <td width="33%" valign="top"><img src="analysis/test_scatter_all.png" alt="scatter_all" width="100%"/><p><strong>Test scatter (all)</strong></p><p>~18k строк; r ≈ 0.14 (шаг 1 ~0.19).</p></td>
-<td width="33%" valign="top"><img src="analysis/test_scatter_fdr005.png" alt="scatter_fdr" width="100%"/><p><strong>Test FDR &lt; 0.05</strong></p><p>r ≈ 0.29 — ближе к шагу 1 (0.33), где метки надёжнее.</p></td>
+<td width="33%" valign="top"><img src="analysis/test_scatter_fdr005.png" alt="scatter_fdr" width="100%"/><p><strong>Test FDR &lt; 0.05</strong></p><p>r ≈ 0.29 — ближе к просто обучению MLP (0.33)</p></td>
 </tr>
 <tr>
 <td width="33%" valign="top"><img src="analysis/test_pearson_by_cell_type_v2.png" alt="pearson_ct" width="100%"/><p><strong>Pearson по типу клетки</strong></p><p>Разброс качества по 37 типам (n ≥ 10).</p></td>
