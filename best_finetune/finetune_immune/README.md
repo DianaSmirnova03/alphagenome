@@ -79,9 +79,7 @@ flowchart LR
 | Шаг 1 v1 aux на FDR | 0.339 (all) | ~0.52 AUC «sig» | 
 | **Шаг 1 v2** ([`best_code_immune`](../../best_code_immune/README.md)) | **0.329** | **0.766** | 
 | **Шаг 2 горячий старт** (эта папка) | 0.171 | 0.675 |  
-
-JSON: [`results_test_metrics.json`](results_test_metrics.json). Early stop шага 2 ~эпоха **46**, best train-val r ≈ **0.175**.
-
+ 
 ### Графики
 
 > PNG генерируются `make_figures.py --e2e` в `analysis/` (или `analysis_v2/` при launch — скопируйте в `analysis/` для README).
