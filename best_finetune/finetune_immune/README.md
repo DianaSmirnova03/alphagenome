@@ -1,13 +1,9 @@
 # Иммунные ASE: дообучение головы AlphaGenome с горячим стартом
 
 Предсказание **allele-specific expression (ASE)** по данным AIDA: для пары «SNP + тип иммунной клетки»
-модель оценивает **combined effect size** (`comb_es`) и косвенно — **направление** allelic imbalance
-(over / under). База — замороженная **AlphaGenome** + обучаемая голова **EffectHead v2**.
-
-> **Навигация.** Сначала — коротко для руководителя (5 минут), затем таблицы и графики, в конце —
-> формулы и карта кода. Промоторная ветка: [`../finetune_promoter/`](../finetune_promoter/README.md).
-
-## Общая схема каталога `best_finetune`
+модель оценивает **combined effect size** (`comb_es`) 
+ 
+## Общая схема 
 
 ```mermaid
 flowchart LR
@@ -27,9 +23,7 @@ flowchart LR
 Общие модули: [`../shared/`](../shared/). Запуск: [`../launch_e2e_head_ft.sh`](../launch_e2e_head_ft.sh) `immune` (GPU 0).
 
 ---
-
-## Коротко (5 минут)
-
+ 
 ### Задача
 
 - **Вход:** SNP (chr, pos, ref, alt) и **тип клетки** (37 типов + unknown в one-hot).
