@@ -423,10 +423,12 @@ $$
 
 $$
 \mathrm{Huber}(r) =
-\begin{cases}
-\dfrac{1}{2} r^2, & |r| \le \delta \\[4pt]
+\left\{
+\begin{array}{ll}
+\dfrac{1}{2} r^2, & |r| \le \delta \\[6pt]
 \delta \left(|r| - \dfrac{1}{2}\delta\right), & |r| > \delta
-\end{cases}
+\end{array}
+\right.
 \qquad
 L = \frac{1}{B} \sum_{n=1}^{B} \mathrm{Huber}\left(\hat{z}_n - z_n\right)
 $$
