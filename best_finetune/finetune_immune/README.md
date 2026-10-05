@@ -73,12 +73,12 @@ flowchart LR
 
 ### Сравнение попыток
 
-| Подход | Val r (chr14) | Test dir AUC FDR&lt;0.05 | Комментарий |
-|--------|---------------|---------------------------|-------------|
-| Курсовая: mean embedding | ~0 | — | сигнал размыт |
-| Шаг 1 v1 aux на FDR | 0.339 (all) | ~0.52 AUC «sig» | aux бессмысленен |
-| **Шаг 1 v2** ([`best_code_immune`](../../best_code_immune/README.md)) | **0.329** | **0.766** | **рекомендуемая модель** |
-| **Шаг 2 горячий старт** (эта папка) | 0.171 | 0.675 | хуже npz, пайплайн валиден |
+| Подход | Val r (chr14) | Test dir AUC FDR&lt;0.05 |  
+|--------|---------------|---------------------------| 
+| Курсовая: mean embedding | ~0 | — | 
+| Шаг 1 v1 aux на FDR | 0.339 (all) | ~0.52 AUC «sig» | 
+| **Шаг 1 v2** ([`best_code_immune`](../../best_code_immune/README.md)) | **0.329** | **0.766** | 
+| **Шаг 2 горячий старт** (эта папка) | 0.171 | 0.675 |  
 
 JSON: [`results_test_metrics.json`](results_test_metrics.json). Early stop шага 2 ~эпоха **46**, best train-val r ≈ **0.175**.
 
