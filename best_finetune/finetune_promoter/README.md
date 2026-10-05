@@ -425,7 +425,7 @@ $$
 \mathrm{Huber}(r) =
 \left\{
 \begin{array}{ll}
-\frac{1}{2} r^2, & |r| \le \delta \\
+\frac{1}{2} r^2, & |r| \le \delta \\[2pt]
 \delta \left(|r| - \frac{1}{2}\delta\right), & |r| > \delta
 \end{array}
 \right.
