@@ -108,12 +108,10 @@ flowchart LR
 | `--val-batch-size` | **16** |
 | `--scaler-batch-size` | **8** |
 | `--lr` | **1e-3** |
-| `--weight-decay` | **1e-4** (default в скрипте) |
+| `--weight-decay` | **1e-4**   |
 | `--max-epochs` | **200** |
 | `--patience` | **15** |
-| `--seed` | **42** (default в скрипте) |
-| GPU | `CUDA_VISIBLE_DEVICES=3` (NVIDIA L40S, 46 ГБ) |
-| Память JAX | `XLA_PYTHON_CLIENT_PREALLOCATE=true`, `XLA_PYTHON_CLIENT_MEM_FRACTION=0.88` |
+| `--seed` | **42**  | 
 
 Пути к данным на сервере calc:
 
@@ -128,13 +126,7 @@ flowchart LR
 | Веса AlphaGenome | не в репозитории; локальный кэш kagglehub `~/.cache/kagglehub/models/google/alphagenome/jax/all_folds/` |
 | Результат обучения | `/mnt/calc/homes/d.smirnova/DIPLOM/alphagenome_snp_finetune/runs/e2e_head_promoter_v1/` (`best.pkl`, `lfc_scaler.npz`, `tensorboard/`) |
 
-Запуск только промоторной части:
-
-```bash
-cd best_finetune
-bash launch_e2e_head_ft.sh promoter   # обучение → оценка → графики в finetune_promoter/analysis/
-```
-
+ 
 ---
 
 ## Файлы в этой папке
